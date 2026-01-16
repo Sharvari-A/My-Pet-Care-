@@ -1,0 +1,1827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>My Pet Care</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    :root {
+      /* Light theme base */
+      --bg: #FFF5EE;
+      --bg-alt: #D1E0DB;
+      --card: #D2E8DF;
+      --text: #14352C;
+      --text-soft: #81A49E;
+      --primary: #182C2D;
+      --accent: #2E6F40;
+      --highlight: #9CAF88;
+      --shadow-soft: rgba(0, 0, 0, 0.08);
+      --border-subtle: rgba(20, 53, 44, 0.12);
+
+      --transition-fast: 0.25s ease;
+      --radius-lg: 18px;
+      --radius-pill: 999px;
+    }
+
+    /* Soft dark theme (lighter tints, not pure black) */
+    body.dark {
+      --bg: #101A1A;
+      --bg-alt: #182425;
+      --card: #1F3131;
+      --text: #E6F3EE;
+      --text-soft: #9BBFB5;
+      --primary: #CDE7DF;
+      --accent: #88C79A;
+      --highlight: #C1D7A6;
+      --shadow-soft: rgba(0, 0, 0, 0.5);
+      --border-subtle: rgba(230, 243, 238, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, var(--bg-alt), var(--bg));
+      color: var(--text);
+      transition: background 0.4s ease, color 0.3s ease;
+      min-height: 100vh;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    .app-shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.2rem 1.2rem 2rem;
+    }
+
+    /* Top bar with logo */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+      padding: 0.75rem 1rem;
+      border-radius: 999px;
+      background: rgba(255, 245, 238, 0.75);
+      box-shadow: 0 10px 30px var(--shadow-soft);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border-subtle);
+      transition: background var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    body.dark .top-bar {
+      background: rgba(16, 26, 26, 0.82);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      min-width: 0;
+    }
+
+    .brand-logo {
+      width: 52px;
+	  height: 52px;
+	  border-radius: 50%;
+	  overflow: hidden;
+	  border: 2px solid var(--accent);
+	  box-shadow: 0 6px 14px var(--shadow-soft);
+	  display: flex;              /* added */
+	  align-items: center;        /* added */
+	  justify-content: center;
+    }
+
+    .brand-logo img {
+      width: 90px;   /* bigger than before */
+	  height: 90px;  /* bigger than before */
+	  object-fit: cover;
+    }
+
+    .brand-text h1 {
+      font-size: 1.25rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin: 0;
+      color: var(--primary);
+      white-space: nowrap;
+    }
+
+    .brand-text p {
+      margin: 0;
+      font-size: 0.8rem;
+      color: var(--text-soft);
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .pill-btn,
+    .icon-toggle {
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-subtle);
+      padding: 0.4rem 0.9rem;
+      font-size: 0.78rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: rgba(210, 232, 223, 0.7);
+      color: var(--primary);
+      cursor: pointer;
+      transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+      box-shadow: 0 4px 10px var(--shadow-soft);
+      backdrop-filter: blur(10px);
+    }
+
+    body.dark .pill-btn,
+    body.dark .icon-toggle {
+      background: rgba(31, 49, 49, 0.85);
+      color: var(--text);
+    }
+
+    .pill-btn:hover,
+    .icon-toggle:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px var(--shadow-soft);
+    }
+
+    .icon-toggle {
+      padding: 0.3rem 0.7rem;
+      font-size: 0.9rem;
+    }
+
+    /* Hero section */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2.8fr);
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+      align-items: center;
+    }
+
+    @media (max-width: 800px) {
+      .hero {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .hero-copy h2 {
+      font-size: 2rem;
+      margin: 0 0 0.35rem;
+      color: var(--primary);
+    }
+
+    .hero-copy p {
+      margin: 0 0 0.8rem;
+      color: var(--text-soft);
+      font-size: 0.92rem;
+    }
+
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .hero-badge {
+      border-radius: 999px;
+      background: rgba(210, 232, 223, 0.9);
+      padding: 0.25rem 0.7rem;
+      font-size: 0.75rem;
+      color: var(--primary);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+    }
+
+    body.dark .hero-badge {
+      background: rgba(31, 49, 49, 0.85);
+      color: var(--text);
+    }
+
+    .search-wrapper {
+      position: relative;
+      margin-top: 0.4rem;
+    }
+
+    .search-wrapper input {
+      width: 100%;
+      padding: 0.7rem 2.4rem 0.7rem 0.95rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-subtle);
+      background: rgba(255, 255, 255, 0.85);
+      color: var(--text);
+      font-size: 0.9rem;
+      outline: none;
+      box-shadow: 0 8px 22px var(--shadow-soft);
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+    }
+
+    body.dark .search-wrapper input {
+      background: rgba(16, 26, 26, 0.95);
+    }
+
+    .search-wrapper input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(46, 111, 64, 0.3);
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1rem;
+      color: var(--text-soft);
+      pointer-events: none;
+    }
+
+    .hero-image-card {
+      border-radius: 26px;
+      background: linear-gradient(135deg, rgba(210, 232, 223, 0.9), rgba(145, 187, 164, 0.8));
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 18px 40px var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    body.dark .hero-image-card {
+      background: radial-gradient(circle at top, #28423E, #162422);
+    }
+
+    .hero-pets {
+      display: flex;
+      gap: 0.4rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .hero-pet-pill {
+      border-radius: 999px;
+      background: rgba(255, 245, 238, 0.85);
+      padding: 0.25rem 0.55rem;
+      font-size: 0.75rem;
+      color: var(--primary);
+    }
+
+    body.dark .hero-pet-pill {
+      background: rgba(16, 26, 26, 0.9);
+      color: var(--text);
+    }
+
+    .hero-stat {
+      font-size: 0.78rem;
+      color: var(--text-soft);
+    }
+
+    /* Section title */
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.6rem;
+      margin: 0 0 0.5rem;
+    }
+
+    .section-title h3 {
+      margin: 0;
+      font-size: 1rem;
+      color: var(--primary);
+    }
+
+    .section-title span {
+      font-size: 0.8rem;
+      color: var(--text-soft);
+    }
+
+    /* Category scroller */
+    .category-strip {
+      display: flex;
+      overflow-x: auto;
+      gap: 0.6rem;
+      padding-bottom: 0.35rem;
+      margin-bottom: 1rem;
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent) transparent;
+    }
+
+    .category-strip::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    .category-strip::-webkit-scrollbar-thumb {
+      background: var(--accent);
+      border-radius: 999px;
+    }
+
+    .category-pill {
+      flex: 0 0 auto;
+      border-radius: 999px;
+      padding: 0.45rem 0.9rem;
+      font-size: 0.85rem;
+      border: 1px solid var(--border-subtle);
+      background: rgba(210, 232, 223, 0.85);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      color: var(--primary);
+      transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+    }
+
+    body.dark .category-pill {
+      background: rgba(31, 49, 49, 0.9);
+      color: var(--text);
+    }
+
+    .category-pill.selected {
+      background: var(--highlight);
+      color: #152016;
+      border-color: transparent;
+      box-shadow: 0 8px 20px var(--shadow-soft);
+      transform: translateY(-1px);
+    }
+
+    /* Breed grid */
+    .grid-layout {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 0.9rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .breed-card {
+      background: var(--card);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 10px 26px var(--shadow-soft);
+      cursor: pointer;
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+      position: relative;
+    }
+
+    body.dark .breed-card {
+      background: #1F3131;
+    }
+
+    .breed-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 30px var(--shadow-soft);
+      border-color: rgba(46, 111, 64, 0.55);
+    }
+
+    .breed-thumb {
+      position: relative;
+      padding-top: 60%;
+      overflow: hidden;
+    }
+
+    .breed-thumb-inner {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      transition: transform 0.7s ease;
+    }
+
+    .breed-card:hover .breed-thumb-inner {
+      transform: scale(1.06);
+    }
+
+    .breed-body {
+      padding: 0.6rem 0.7rem 0.55rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.4rem;
+    }
+
+    .breed-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .breed-meta {
+      font-size: 0.7rem;
+      color: var(--text-soft);
+    }
+
+    .fav-icon {
+      font-size: 1rem;
+      cursor: pointer;
+      color: rgba(20, 53, 44, 0.25);
+      transition: color var(--transition-fast), transform var(--transition-fast);
+      flex-shrink: 0;
+    }
+
+    .fav-icon.active {
+      color: #ffb74d;
+      transform: scale(1.13);
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--text-soft);
+    }
+
+    .empty-state-emoji {
+      font-size: 3rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .empty-state p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    /* Detail panel */
+    .detail-panel {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.3);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.2rem;
+      z-index: 50;
+    }
+
+    .detail-panel.open {
+      display: flex;
+      animation: fadeIn 0.25s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .detail-card {
+      max-width: 880px;
+      width: 100%;
+      max-height: 90vh;
+      background: linear-gradient(135deg, var(--bg-alt), var(--bg));
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 26px 60px rgba(0, 0, 0, 0.38);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .detail-hero {
+      position: relative;
+      padding: 1rem 1.1rem 0.8rem;
+    }
+
+    .detail-hero-image {
+      border-radius: 18px;
+      overflow: hidden;
+      height: 190px;
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 14px 32px var(--shadow-soft);
+    }
+
+    .detail-hero-top {
+      position: absolute;
+      inset: 1rem 1.1rem auto 1.1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .detail-hero-top button {
+      pointer-events: auto;
+    }
+
+    .detail-hero-title {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+
+    .detail-hero-title h2 {
+      margin: 0;
+      font-size: 1.3rem;
+      color: #ffffff;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+    }
+
+    .detail-hero-title span {
+      font-size: 0.78rem;
+      color: #f3f3f3;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+    }
+
+    .detail-close {
+      border-radius: 999px;
+      border: none;
+      background: rgba(16, 26, 26, 0.75);
+      color: #fff;
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+      font-size: 1rem;
+    }
+
+    .detail-body {
+      padding: 0.9rem 1.1rem 1.1rem;
+      overflow-y: auto;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 0.7rem;
+    }
+
+    .info-card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 0.65rem 0.7rem 0.6rem;
+      box-shadow: 0 10px 26px var(--shadow-soft);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+    }
+
+    body.dark .info-card {
+      background: #1F3131;
+    }
+
+    .info-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 32px var(--shadow-soft);
+      border-color: rgba(46, 111, 64, 0.6);
+    }
+
+    .info-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.4rem;
+    }
+
+    .info-header h4 {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--primary);
+    }
+
+    .info-header span {
+      font-size: 1rem;
+    }
+
+    .info-body ul {
+      margin: 0.1rem 0 0;
+      padding-left: 1.1rem;
+    }
+
+    .info-body li {
+      font-size: 0.78rem;
+      line-height: 1.4;
+      color: var(--text);
+    }
+
+    .info-tag {
+      font-size: 0.7rem;
+      color: var(--text-soft);
+    }
+
+    /* Favorites modal */
+    .favorites-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.2rem;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 40;
+    }
+
+    .favorites-modal.open {
+      display: flex;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .favorites-card {
+      max-width: 520px;
+      width: 100%;
+      max-height: 80vh;
+      border-radius: 22px;
+      background: linear-gradient(135deg, var(--bg-alt), var(--bg));
+      box-shadow: 0 22px 50px rgba(0, 0, 0, 0.46);
+      padding: 0.9rem 1rem 0.9rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+
+    .favorites-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .favorites-header h3 {
+      margin: 0;
+      font-size: 1rem;
+      color: var(--primary);
+    }
+
+    .favorites-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      overflow-y: auto;
+    }
+
+    .favorites-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.6rem;
+      padding: 0.4rem 0.4rem;
+      border-radius: 14px;
+      background: rgba(210, 232, 223, 0.9);
+      cursor: pointer;
+      transition: background var(--transition-fast), transform var(--transition-fast);
+    }
+
+    body.dark .favorites-item {
+      background: rgba(31, 49, 49, 0.95);
+    }
+
+    .favorites-item:hover {
+      transform: translateY(-1px);
+    }
+
+    .favorites-item span {
+      font-size: 0.86rem;
+      color: var(--primary);
+    }
+
+    .favorites-item button {
+      border-radius: 999px;
+      border: none;
+      background: transparent;
+      color: #ffb74d;
+      font-size: 1.1rem;
+      cursor: pointer;
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 600px) {
+      .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        padding-inline: 0.9rem;
+      }
+      .hero-copy h2 {
+        font-size: 1.6rem;
+      }
+      .detail-card {
+        max-height: 95vh;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- TOP BAR -->
+    <header class="top-bar">
+      <div class="brand">
+        <div class="brand-logo">
+          <img src="https://branition.com/assets/img/users/logos/11633-07FbkDf.webp" alt="My Pet Care Logo" />
+        </div>
+        <div class="brand-text">
+          <h1>My Pet Care</h1>
+          <p>Healthy pets, no regrets.</p>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="icon-toggle" id="themeToggle" aria-label="Toggle theme">
+          🌓 <span class="toggle-label">Dark</span>
+        </button>
+        <button class="pill-btn" id="favoritesBtn">
+          ⭐ Favorites
+        </button>
+      </div>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-copy">
+        <h2>Care made simple 🐾</h2>
+        <p>Instant, breed-smart tips for food, grooming, exercise, and health so your buddy stays happy and thriving.</p>
+        <div class="hero-badges">
+          <span class="hero-badge">Breed-based tips</span>
+          <span class="hero-badge">Vet-friendly guidance</span>
+          <span class="hero-badge">Quick do's & don'ts</span>
+        </div>
+        <div class="search-wrapper">
+          <input id="searchInput" type="search" placeholder="Search by breed or pet type (e.g. Labrador, Persian cat, parrot) 🔍" />
+          <span class="search-icon">⌕</span>
+        </div>
+      </div>
+
+      <div class="hero-image-card">
+        <div class="hero-pets">
+          <span class="hero-pet-pill">🐶 Dogs</span>
+          <span class="hero-pet-pill">🐱 Cats</span>
+          <span class="hero-pet-pill">🕊️ Birds</span>
+          <span class="hero-pet-pill">🐟 Fish</span>
+          <span class="hero-pet-pill">🐰 Rabbits</span>
+        </div>
+        <div class="hero-stat">
+          Trusted daily by pet parents who want calm, confident care routines. 💚
+        </div>
+      </div>
+    </section>
+
+    <!-- CATEGORIES -->
+    <section>
+      <div class="section-title">
+        <h3>Pick a pet family</h3>
+        <span>Tap a category to see breeds</span>
+      </div>
+      <div class="category-strip" id="categoryStrip">
+        <button class="category-pill selected" data-category="dog">🐶 Dog</button>
+        <button class="category-pill" data-category="cat">🐱 Cat</button>
+        <button class="category-pill" data-category="bird">🕊️ Bird</button>
+        <button class="category-pill" data-category="fish">🐟 Fish</button>
+        <button class="category-pill" data-category="rabbit">🐰 Rabbit</button>
+        <button class="category-pill" data-category="hamster">🐹 Hamster</button>
+        <button class="category-pill" data-category="lizard">🦎 Reptile</button>
+      </div>
+    </section>
+
+    <!-- FEATURED BREEDS (shown by default when no search) -->
+    <section id="featuredSection" style="display: none;">
+      <div class="section-title">
+        <h3 id="featuredTitle">Featured & Popular Breeds</h3>
+        <span id="featuredLabel">Popular picks for new pet parents</span>
+      </div>
+      <div class="grid-layout" id="featuredGrid">
+        <!-- JS injected featured cards -->
+      </div>
+    </section>
+
+    <!-- BREED GRID (shown when category selected or search active) -->
+    <section id="breedSection">
+      <div class="section-title">
+        <h3 id="breedSectionTitle">Popular dog breeds</h3>
+        <span id="breedCountLabel">Tap a card to open detailed care</span>
+      </div>
+      <div class="grid-layout" id="breedGrid">
+        <!-- JS injected cards -->
+      </div>
+    </section>
+  </div>
+
+  <!-- DETAIL PANEL -->
+  <div class="detail-panel" id="detailPanel" aria-hidden="true">
+    <div class="detail-card" role="dialog" aria-modal="true">
+      <div class="detail-hero">
+        <div class="detail-hero-image" id="detailHeroImage"></div>
+        <div class="detail-hero-top">
+          <div class="detail-hero-title">
+            <h2 id="detailBreedName"></h2>
+            <span id="detailBreedMeta"></span>
+          </div>
+          <button class="detail-close" id="detailCloseBtn" aria-label="Close details">✕</button>
+        </div>
+      </div>
+      <div class="detail-body">
+        <div class="detail-grid" id="detailGrid">
+          <!-- JS injected info cards -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAVORITES MODAL -->
+  <div class="favorites-modal" id="favoritesModal" aria-hidden="true">
+    <div class="favorites-card">
+      <div class="favorites-header">
+        <h3>Saved favorites ⭐</h3>
+        <button class="detail-close" id="favoritesCloseBtn" aria-label="Close favorites">✕</button>
+      </div>
+      <ul class="favorites-list" id="favoritesList">
+        <!-- JS injected favorites -->
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // --- Data --- //
+    const BREEDS = [
+      {
+        id: "lab",
+        name: "Labrador Retriever",
+        category: "dog",
+        size: "Medium–large",
+        featured: true,
+        image:
+          "https://bestforpet.com.au/wp-content/uploads/2025/07/Labrador_Retriever_1200x800.jpg",
+        care: {
+          food: [
+            "High-quality kibble with meat as first ingredient.",
+            "Split meals into 2–3 portions to avoid overeating.",
+            "Watch treats; Labs gain weight easily."
+          ],
+          med: [
+            "Core vaccines as per vet schedule.",
+            "Routine deworming every 3–6 months.",
+            "Screen for hip & elbow dysplasia."
+          ],
+          groom: [
+            "Brush 2–3× weekly to manage shedding.",
+            "Clean ears weekly to prevent infections.",
+            "Bathe every 4–6 weeks or when dirty."
+          ],
+          exercise: [
+            "At least 60–90 minutes of daily exercise.",
+            "Mix walks, swimming, and fetch games.",
+            "Include mental games like scent work."
+          ],
+          health: [
+            "Prone to obesity; monitor body shape.",
+            "Joint issues common; use joint-support diet if advised.",
+            "Watch for ear infections after swimming."
+          ],
+          dos: [
+            "Do provide puzzle toys and training.",
+            "Do start leash and recall training early."
+          ],
+          donts: [
+            "Don't overfeed or free-feed.",
+            "Don't force intense exercise in hot weather."
+          ]
+        }
+      },
+      {
+        id: "gsd",
+        name: "German Shepherd",
+        category: "dog",
+        size: "Large",
+        featured: true,
+        image:
+          "https://images.pexels.com/photos/333083/pexels-photo-333083.jpeg?auto=compress&cs=tinysrgb&w=800",
+        care: {
+          food: [
+            "Balanced diet with good protein and joint support.",
+            "Adjust portions to activity level.",
+            "Avoid rapid diet changes to protect digestion."
+          ],
+          med: [
+            "Stay updated on vaccines and flea/tick control.",
+            "Discuss hip & elbow x-rays with your vet.",
+            "Regular dental checks and brushing."
+          ],
+          groom: [
+            "Brush coat 3–4× weekly during shedding seasons.",
+            "Check nails and trim when needed.",
+            "Inspect skin for hotspots or irritation."
+          ],
+          exercise: [
+            "Need 90+ minutes of physical activity daily.",
+            "Include obedience and nose work to prevent boredom.",
+            "Great for agility and structured play."
+          ],
+          health: [
+            "Hip dysplasia and degenerative myelopathy risk.",
+            "Bloat risk; use slow-feeder bowls if advised.",
+            "Monitor for skin allergies."
+          ],
+          dos: [
+            "Do provide consistent training and boundaries.",
+            "Do socialize early with people and dogs."
+          ],
+          donts: [
+            "Don't leave them under-stimulated and alone for long periods.",
+            "Don't use harsh punishment-based training."
+          ]
+        }
+      },
+      {
+        id: "persian",
+        name: "Persian Cat",
+        category: "cat",
+        size: "Medium",
+        featured: true,
+        image:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkGhCZr3dW3Pj2GZ-NhD1wjyLZhp6YqTIcPw&s",
+        care: {
+          food: [
+            "Feed premium cat food tailored for indoor cats.",
+            "Offer fresh water in a wide bowl or fountain.",
+            "Avoid frequent treats to prevent weight gain."
+          ],
+          med: [
+            "Yearly vet checks and vaccines.",
+            "Eye cleaning may be needed for tear staining.",
+            "Dental checks; consider dental diets or treats."
+          ],
+          groom: [
+            "Daily gentle brushing to prevent mats.",
+            "Check for tangles behind ears and legs.",
+            "Trim nails regularly."
+          ],
+          exercise: [
+            "Short, frequent play sessions (5–10 minutes).",
+            "Use wand toys and climbing trees.",
+            "Provide scratching posts in different spots."
+          ],
+          health: [
+            "Brachycephalic issues: watch breathing and eye health.",
+            "Prone to kidney disease; monitor bloodwork as advised.",
+            "Regular weight checks to avoid obesity."
+          ],
+          dos: [
+            "Do keep litter box clean and quiet.",
+            "Do introduce grooming from a young age."
+          ],
+          donts: [
+            "Don't ignore sudden changes in appetite or grooming.",
+            "Don't let long fur stay wet; dry gently after baths."
+          ]
+        }
+      },
+      {
+        id: "siamese",
+        name: "Siamese Cat",
+        category: "cat",
+        size: "Medium",
+        featured: true,
+        image:
+          "https://images.pexels.com/photos/326875/pexels-photo-326875.jpeg?auto=compress&cs=tinysrgb&w=800",
+        care: {
+          food: [
+            "High-protein wet + dry mix works well.",
+            "Feed measured portions 2–3× daily.",
+            "Limit human food to avoid stomach upsets."
+          ],
+          med: [
+            "Routine vaccines and parasite prevention.",
+            "Monitor dental health; schedule cleanings.",
+            "Discuss genetic screening with vet if available."
+          ],
+          groom: [
+            "Short coat; weekly brushing is enough.",
+            "Check ears and clean gently if needed.",
+            "Trim nails every 2–4 weeks."
+          ],
+          exercise: [
+            "Very active; plan multiple play sessions.",
+            "Interactive toys and climbing shelves help.",
+            "Rotate toys to keep play interesting."
+          ],
+          health: [
+            "May have dental and respiratory issues.",
+            "Monitor weight; they should stay lean and athletic.",
+            "Watch for behavior changes, they're expressive communicators."
+          ],
+          dos: [
+            "Do provide companionship and mental stimulation.",
+            "Do use puzzle feeders for meals."
+          ],
+          donts: [
+            "Don't leave alone without enrichment for long hours.",
+            "Don't ignore vocal changes; they often signal needs."
+          ]
+        }
+      },
+      {
+        id: "budgie",
+        name: "Budgerigar (Budgie)",
+        category: "bird",
+        size: "Small",
+        featured: true,
+        image:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQoLPF49fVsWntdAx8yDk0_PBWvn6olTrkGQ&s",
+        care: {
+          food: [
+            "Base diet of quality pellets plus seeds.",
+            "Daily fresh greens and safe vegetables.",
+            "Avoid avocado, chocolate, caffeine, and alcohol."
+          ],
+          med: [
+            "Annual avian vet check recommended.",
+            "Keep cage clean to prevent respiratory issues.",
+            "Watch droppings for sudden changes."
+          ],
+          groom: [
+            "Provide shallow dish or misting for baths.",
+            "Offer cuttlebone for beak and calcium.",
+            "Trim nails only if overgrown (by trained person)."
+          ],
+          exercise: [
+            "Daily out-of-cage flight time in a safe room.",
+            "Perches of different sizes and textures.",
+            "Rotate toys to prevent boredom."
+          ],
+          health: [
+            "Very good at hiding illness; subtle signs matter.",
+            "Fluffed feathers + lethargy = vet visit.",
+            "Draft-free, smoke-free environment is essential."
+          ],
+          dos: [
+            "Do offer gentle, regular interaction.",
+            "Do place cage at eye level in a calm, bright area."
+          ],
+          donts: [
+            "Don't use aerosol sprays near birds.",
+            "Don't grab or chase; use patience to build trust."
+          ]
+        }
+      },
+      {
+        id: "goldfish",
+        name: "Goldfish",
+        category: "fish",
+        size: "Variable",
+        featured: true,
+        image:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDg3CNAipxLSRUgSmUiTtDUpcbwraUNw7dvA&s",
+        care: {
+          food: [
+            "High-quality goldfish pellets or flakes.",
+            "Feed small amounts 1–2× daily; remove uneaten food.",
+            "Add occasional peas or veggies (skin removed)."
+          ],
+          med: [
+            "Cycle tank before adding fish.",
+            "Test water regularly for ammonia, nitrite, nitrate.",
+            "Quarantine new fish when possible."
+          ],
+          groom: [
+            "Maintain filter; rinse media in tank water, not tap.",
+            "Clean glass with aquarium-safe tools.",
+            "Vacuum substrate during water changes."
+          ],
+          exercise: [
+            "Provide a tank large enough for active swimming.",
+            "Avoid over-decorating; leave open swim space.",
+            "Use gentle flow; avoid strong currents."
+          ],
+          health: [
+            "Watch for clamped fins, spots, or erratic swimming.",
+            "Swim bladder issues linked to overfeeding.",
+            "Stable temperature and clean water are key."
+          ],
+          dos: [
+            "Do research tank size (many need 75 L+).",
+            "Do perform regular partial water changes."
+          ],
+          donts: [
+            "Don't keep goldfish in bowls.",
+            "Don't change all water at once unless directed."
+          ]
+        }
+      },
+      {
+        id: "lop",
+        name: "Holland Lop Rabbit",
+        category: "rabbit",
+        size: "Small",
+        featured: true,
+        image:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRd3lTVttRo5X8lTgT417Tm6FjqexY7GZOMig&s",
+        care: {
+          food: [
+            "Unlimited fresh hay as main diet.",
+            "Measured pellets and leafy greens daily.",
+            "Avoid sugary treats and iceberg lettuce."
+          ],
+          med: [
+            "Rabbit-savvy vet visits at least yearly.",
+            "Vaccines may be required depending on region.",
+            "Monitor teeth for overgrowth or drooling."
+          ],
+          groom: [
+            "Brush weekly; more during shedding.",
+            "Never bathe fully; spot-clean only.",
+            "Check underside and bottom for soiling."
+          ],
+          exercise: [
+            "Daily free-roam time in a rabbit-safe area.",
+            "Tunnels, boxes, and chew toys for enrichment.",
+            "Non-slip flooring to protect joints."
+          ],
+          health: [
+            "GI stasis is an emergency; watch for appetite and droppings.",
+            "Heat sensitive; keep environment cool.",
+            "Spay/neuter reduces health and behavior issues."
+          ],
+          dos: [
+            "Do offer quiet hiding spots.",
+            "Do handle gently, supporting back and hindquarters."
+          ],
+          donts: [
+            "Don't pick up by ears or scruff.",
+            "Don't keep on wire-only flooring."
+          ]
+        }
+      },
+      {
+        id: "bulldog",
+        name: "English Bulldog",
+        category: "dog",
+        size: "Medium",
+        image:
+          "https://upload.wikimedia.org/wikipedia/commons/b/bf/Bulldog_inglese.jpg",
+        care: {
+          food: ["Moderate portions to prevent obesity.", "Quality protein sources.", "Always fresh water available."],
+          med: ["Regular vet checkups.", "Watch breathing and heat sensitivity.", "Dental care important."],
+          groom: ["Regular wrinkle cleaning.", "Nail trimming.", "Ear checks weekly."],
+          exercise: ["Short walks in cool weather.", "Avoid intense heat.", "Indoor play is fine."],
+          health: ["Heat intolerant.", "Breathing issues common.", "Hip dysplasia screening advised."],
+          dos: ["Do keep cool during summer.", "Do maintain healthy weight."],
+          donts: ["Don't exercise in hot weather.", "Don't breed without screening."]
+        }
+      },
+      {
+        id: "mainecoon",
+        name: "Maine Coon Cat",
+        category: "cat",
+        size: "Large",
+        image:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxVgGWDriJ5P3zjTubxIVtSIZ29oAPu-IUrA&s",
+        care: {
+          food: ["High-quality cat food.", "Regular feeding schedule.", "Plenty of fresh water."],
+          med: ["Annual vet visits.", "Heart screening recommended.", "Dental care important."],
+          groom: ["Daily brushing needed.", "Regular nail trimming.", "Check ears weekly."],
+          exercise: ["Interactive play sessions.", "Climbing structures helpful.", "Engage their hunting instincts."],
+          health: ["Hip dysplasia possible.", "Heart issues to watch.", "Kidney disease screening."],
+          dos: ["Do provide climbing areas.", "Do brush daily to prevent mats."],
+          donts: ["Don't ignore dental care.", "Don't leave alone for extended periods."]
+        }
+      },
+      {
+        id: "cockatiel",
+        name: "Cockatiel",
+        category: "bird",
+        size: "Medium",
+        featured: true,
+        image:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHdF-l9FOsbc0fObYM1Wqe6rm6r8H6md_jaA&s",
+        care: {
+          food: ["Pellets as base diet.", "Fresh fruits and vegetables daily.", "Avoid salt and avocado."],
+          med: ["Annual avian vet checkups.", "Monitor for signs of illness.", "Proper lighting important."],
+          groom: ["Provide bathing opportunities.", "Cuttlebone for minerals.", "Perch variety recommended."],
+          exercise: ["Out-of-cage time daily.", "Social interaction needed.", "Enrichment toys essential."],
+          health: ["Can live 15-20+ years.", "Watch for respiratory issues.", "Nutritional deficiencies common."],
+          dos: ["Do socialize regularly.", "Do provide 10-12 hours sleep."],
+          donts: ["Don't expose to fumes.", "Don't keep isolated."]
+        }
+      },
+      {
+        id: "parrot",
+        name: "African Grey Parrot",
+        category: "bird",
+        size: "Large",
+        featured: true,
+        image:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvq1rFGUZJMrH2IOKkT1CpG53bCk5m8HlWMw&s",
+        care: {
+          food: ["Pellets, nuts, seeds, and fresh produce.", "Avoid chocolate, salt, and caffeine.", "Vary diet for enrichment."],
+          med: ["Annual avian vet visits essential.", "Watch for signs of vitamin A deficiency.", "Regular health screenings."],
+          groom: ["Provide regular bathing opportunities.", "Natural wood perches for claw maintenance.", "Wing clipping by professional if needed."],
+          exercise: ["Multiple hours out-of-cage daily.", "Interactive play and training.", "Mental stimulation critical for behavior."],
+          health: ["Can live 40-60+ years; long commitment.", "Susceptible to respiratory issues.", "Behavioral problems from boredom."],
+          dos: ["Do provide toys and enrichment.", "Do maintain consistent routine."],
+          donts: ["Don't keep in small cages.", "Don't ignore social needs."]
+        }
+      },
+      {
+        id: "canary",
+        name: "Canary",
+        category: "bird",
+        size: "Small",
+        image:
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/GelbA.JPG/330px-GelbA.JPG",
+        care: {
+          food: ["Quality seed mix for canaries.", "Fresh vegetables and greens daily.", "Avoid avocado and chocolate."],
+          med: ["Annual vet check-ups.", "Monitor for mites and parasites.", "Keep environment stress-free."],
+          groom: ["Natural perches at different diameters.", "Occasional misting for bathing.", "Nail checks regularly."],
+          exercise: ["Daily flight time in safe area.", "Perches at varying heights.", "Natural daylight or full-spectrum lighting."],
+          health: ["Sensitive to drafts and temperature changes.", "Respiratory issues if stressed.", "Poor air quality harmful."],
+          dos: ["Do provide natural sunlight.", "Do keep noise and stress low."],
+          donts: ["Don't keep with other bird species.", "Don't expose to fumes or aerosols."]
+        }
+      },
+      {
+        id: "quail",
+        name: "Japanese Quail",
+        category: "bird",
+        size: "Small",
+        image:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIMPBdhiU0VQ2LBbqz0eMxDR1fv30DpQ6Eow&s",
+        care: {
+          food: ["Game bird feed or quail pellets.", "Fresh greens and vegetables.", "Provide grit for digestion."],
+          med: ["Regular health checks for parasites.", "Keep housing clean to prevent disease.", "Vaccinations if applicable."],
+          groom: ["Dust baths essential for feather health.", "Clean bedding at least twice weekly.", "Nesting materials provided."],
+          exercise: ["Access to outdoor enclosed area best.", "Room to move and explore.", "Dust bathing area important."],
+          health: ["Hardy birds with few major issues.", "Watch for egg-related problems in females.", "Heat stress in hot climates."],
+          dos: ["Do provide spacious housing.", "Do include nesting materials."],
+          donts: ["Don't overcrowd housing.", "Don't expose to extreme temperatures."]
+        }
+      },
+      {
+        id: "bettafish",
+        name: "Betta Fish",
+        category: "fish",
+        size: "Small",
+        featured: true,
+        image:
+          "https://5.imimg.com/data5/ANDROID/Default/2023/2/HL/GW/QX/29367984/product-jpeg-500x500.jpg",
+        care: {
+          food: ["High-protein betta pellets.", "Occasional live food treats.", "Feed once or twice daily."],
+          med: ["Tank maintenance critical.", "Temperature 75-80°F ideal.", "Regular water testing."],
+          groom: ["Tank cleaning every week.", "Filter maintenance.", "Live plants help."],
+          exercise: ["Swimming space needed.", "Mirrors for exercise carefully.", "Hiding spots important."],
+          health: ["Prone to fin rot.", "Watch for lethargy.", "Bloating from overfeeding."],
+          dos: ["Do maintain proper temperature.", "Do perform regular water changes."],
+          donts: ["Don't keep with aggressive fish.", "Don't overfeed."]
+        }
+      },
+      {
+        id: "tetra",
+        name: "Neon Tetra",
+        category: "fish",
+        size: "Small",
+        image:
+          "https://m.media-amazon.com/images/I/71abF1pux8L.jpg",
+        care: {
+          food: ["Small flakes or micro pellets.", "Occasional small live foods.", "Feed small amounts 2-3 times daily."],
+          med: ["Maintain stable water conditions.", "pH 6.0-7.0, temperature 68-72°F.", "Quarantine new fish."],
+          groom: ["Weekly 25% water changes.", "Gentle filter flow preferred.", "Live plants beneficial."],
+          exercise: ["Plenty of swimming space.", "Plants for hiding and exploration.", "Community tank friendly."],
+          health: ["Sensitive to poor water quality.", "Neon tetra disease possible.", "Watch for white spots (ich)."],
+          dos: ["Do keep in groups of 6+.", "Do maintain excellent water quality."],
+          donts: ["Don't overcrowd tank.", "Don't expose to ammonia spikes."]
+        }
+      },
+      {
+        id: "guppy",
+        name: "Guppy Fish",
+        category: "fish",
+        size: "Small",
+        image:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRd3F0tybvk8aDeyVWZTKPikghWvtr7MrVzXQ&s",
+        care: {
+          food: ["Small flakes and micro pellets.", "Live foods like daphnia.", "Feed 2-3 times daily."],
+          med: ["Maintain water temperature 72-82°F.", "pH neutral to slightly alkaline.", "Monitor for diseases."],
+          groom: ["Weekly water changes.", "Keep filter clean.", "Remove excess food immediately."],
+          exercise: ["Moderate swimming space needed.", "Plants and decorations for exploring.", "Subdued lighting preferred."],
+          health: ["Hardy fish overall.", "Prone to fin rot in poor conditions.", "Susceptible to common fish diseases."],
+          dos: ["Do maintain stable parameters.", "Do provide plant coverage."],
+          donts: ["Don't keep in very small tanks.", "Don't house with large aggressive fish."]
+        }
+      },
+      {
+        id: "angelfish",
+        name: "Angelfish",
+        category: "fish",
+        size: "Medium",
+        image:
+          "https://5.imimg.com/data5/SY/IF/RJ/SELLER-4075233/angel-fish.jpg",
+        care: {
+          food: ["Quality flakes and pellets.", "Occasional frozen foods like bloodworms.", "Feed 2-3 times daily."],
+          med: ["Temperature 75-82°F, pH 6.5-7.5.", "Perform weekly water changes.", "Monitor water quality closely."],
+          groom: ["Clean filter weekly.", "Remove uneaten food promptly.", "Maintain plant life."],
+          exercise: ["Tall tank preferred for body shape.", "Vertical space important.", "Some hiding spots needed."],
+          health: ["Susceptible to ick and fin rot.", "May eat smaller fish as they grow.", "Watch for body spot disease."],
+          dos: ["Do provide tall tanks.", "Do keep water clean and stable."],
+          donts: ["Don't house with very small fish.", "Don't neglect water quality."]
+        }
+      },
+      {
+        id: "rex",
+        name: "Rex Rabbit",
+        category: "rabbit",
+        size: "Medium",
+        image:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSSp3uRcpw_wzaqdNi5FxxoSpmiBsM5c-U5Q&s",
+        care: {
+          food: ["Unlimited timothy hay.", "Quality pellets for medium rabbits.", "Fresh vegetables daily."],
+          med: ["Vet check-ups yearly.", "Spay/neuter recommended.", "Monitor for respiratory issues."],
+          groom: ["Gentle brushing 2-3 times weekly.", "Keep nails trimmed.", "Check for ear mites."],
+          exercise: ["Daily supervised exercise.", "Rabbit-proofed play area.", "Climbing structures appreciated."],
+          health: ["Soft fur prone to matting.", "Watch for wool block from ingesting fur.", "Susceptible to heat stress."],
+          dos: ["Do provide varied textures.", "Do brush regularly to prevent matting."],
+          donts: ["Don't bathe; spot-clean only.", "Don't keep in humid environments."]
+        }
+      },
+      {
+        id: "syrian",
+        name: "Syrian Hamster",
+        category: "hamster",
+        size: "Small",
+        featured: true,
+        image:
+          "https://cdn.creatures.com/34d/8a7/caa/5ca55.jpeg",
+        care: {
+          food: ["High-quality hamster mix.", "Fresh vegetables daily.", "Occasional seeds and nuts as treats."],
+          med: ["Annual vet check-ups.", "Watch for respiratory issues.", "Monitor teeth for overgrowth."],
+          groom: ["Natural sand baths.", "Regular bedding changes.", "Clean food bowls daily."],
+          exercise: ["Large exercise wheel (8+ inches).", "Tunneling and burrowing opportunities.", "Exploration time in safe area."],
+          health: ["Prone to tumors as they age.", "Dental problems common.", "Heat and humidity sensitive."],
+          dos: ["Do provide large wheel.", "Do offer enrichment activities."],
+          donts: ["Don't house with other hamsters.", "Don't keep in small cages."]
+        }
+      },
+      {
+        id: "dwarf",
+        name: "Dwarf Hamster",
+        category: "hamster",
+        size: "Tiny",
+        image:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWhFPsC2KGUp9xZ4Jl7mT8fYUadiIZbI1yvA&s",
+        care: {
+          food: ["Small-portion hamster food.", "Fresh greens and vegetables.", "Limited seeds and nuts."],
+          med: ["Annual health checks.", "Monitor for injury given size.", "Watch for sudden weight loss."],
+          groom: ["Sand baths for cleaning.", "Frequent bedding changes.", "Keep food area clean."],
+          exercise: ["Small wheel (6-7 inches) safe size.", "Tunnels and hiding spots.", "Daytime play in enclosure."],
+          health: ["Small size makes them fragile.", "Short lifespan (2-3 years).", "Prone to stress from handling."],
+          dos: ["Do handle gently and carefully.", "Do provide soft bedding."],
+          donts: ["Don't drop or apply pressure.", "Don't keep in drafty areas."]
+        }
+      },
+      {
+        id: "beardie",
+        name: "Bearded Dragon",
+        category: "lizard",
+        size: "Medium",
+        featured: true,
+        image:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQOk4ZWe8kpmGYgECIu1BxmtyUJefxbl5LDEQ&s",
+        care: {
+          food: ["Insects (crickets, roaches, dubia).", "Leafy greens and vegetables.", "Calcium and vitamin supplements."],
+          med: ["UVB lighting essential for growth.", "Temperature gradient 75-95°F.", "Annual veterinary exams."],
+          groom: ["Provide basking spots.", "Regular substrate changes.", "Clean water bowl daily."],
+          exercise: ["Large enclosure minimum 40 gallons.", "Climbing branches and rocks.", "Outdoor time in warm months."],
+          health: ["Metabolic bone disease if no UVB.", "Impaction from poor diet.", "Respiratory infections possible."],
+          dos: ["Do provide UVB lighting 10-12 hours.", "Do offer varied diet."],
+          donts: ["Don't skip calcium supplements.", "Don't house with other dragons."]
+        }
+      },
+      {
+        id: "cornsnake",
+        name: "Corn Snake",
+        category: "lizard",
+        size: "Medium",
+        image:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRX3_bSQ7lW14Ejm2__MiTtGKHUTmitWsVPtw&s",
+        care: {
+          food: ["Pre-killed or frozen-thawed mice/rats.", "Feed every 5-7 days.", "Adjust prey size to snake size."],
+          med: ["Temperature maintained 75-85°F.", "Humidity 40-60%.", "Annual vet check-ups."],
+          groom: ["Provide hiding spots.", "Spot clean enclosure.", "Full substrate change monthly."],
+          exercise: ["Minimum 40-gallon breeder tank.", "Branches for climbing.", "Secure escape-proof enclosure."],
+          health: ["Generally hardy and healthy.", "Watch for respiratory infections.", "Shedding is normal process."],
+          dos: ["Do provide hides.", "Do maintain temperature gradient."],
+          donts: ["Don't use live prey often.", "Don't handle during shedding."]
+        }
+      },
+      {
+        id: "leopard",
+        name: "Leopard Gecko",
+        category: "lizard",
+        size: "Small",
+        image:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSziEi9L1NsankNUICQWyutp2ewCn3nrG1BA&s",
+        care: {
+          food: ["Insects (crickets, mealworms, dubia).", "Dust with calcium and vitamins.", "Feed juveniles daily, adults 3-4× weekly."],
+          med: ["Temperature gradient 75-88°F day, 65°F night.", "Minimal UVB required.", "Regular temperature and humidity checks."],
+          groom: ["Provide multiple hides.", "Paper or tile substrate preferred.", "Calcium dishes available."],
+          exercise: ["20-gallon tank minimum.", "Flat surfaces for ground dwelling.", "Safe exploration areas."],
+          health: ["Metabolic bone disease from poor diet.", "Tail loss possible; regrows incompletely.", "Respiratory issues if too moist."],
+          dos: ["Do provide hides in warm and cool areas.", "Do dust insects with supplements."],
+          donts: ["Don't keep in high humidity.", "Don't house with other geckos."]
+        }
+      },
+      {
+        id: "ballfrog",
+        name: "African Bullfrog",
+        category: "lizard",
+        size: "Medium",
+        image:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtaOfAbEuDJdB9hzqDv4PILtB1gZkTwIM0VQ&s",
+        care: {
+          food: ["Large insects and small vertebrates.", "Crickets, roaches, small mice.", "Feed juveniles daily, adults 3-4× weekly."],
+          med: ["Humidity 60-80%.", "Temperature 75-85°F.", "Regular water bowl changes."],
+          groom: ["Moist substrate (peat moss, coconut).", "Shallow water dish.", "Spot clean frequently."],
+          exercise: ["Minimum 20-gallon tank.", "Room to burrow.", "Climbing branches optional."],
+          health: ["Prone to obesity if overfed.", "Skin infections from poor conditions.", "Aggressive predatory nature."],
+          dos: ["Do maintain high humidity.", "Do provide burrowing substrate."],
+          donts: ["Don't house with smaller animals.", "Don't overfeed."]
+        }
+      }
+    ];
+
+    // --- State --- //
+    const state = {
+      category: "dog",
+      search: "",
+      favorites: new Set(),
+      detail: null,
+      showFeatured: true
+    };
+
+    // --- DOM --- //
+    const categoryStrip = document.getElementById("categoryStrip");
+    const breedGrid = document.getElementById("breedGrid");
+    const breedSectionTitle = document.getElementById("breedSectionTitle");
+    const breedCountLabel = document.getElementById("breedCountLabel");
+    const searchInput = document.getElementById("searchInput");
+    const featuredSection = document.getElementById("featuredSection");
+    const featuredGrid = document.getElementById("featuredGrid");
+    const breedSection = document.getElementById("breedSection");
+
+    const detailPanel = document.getElementById("detailPanel");
+    const detailHeroImage = document.getElementById("detailHeroImage");
+    const detailBreedName = document.getElementById("detailBreedName");
+    const detailBreedMeta = document.getElementById("detailBreedMeta");
+    const detailGrid = document.getElementById("detailGrid");
+    const detailCloseBtn = document.getElementById("detailCloseBtn");
+
+    const favoritesModal = document.getElementById("favoritesModal");
+    const favoritesList = document.getElementById("favoritesList");
+    const favoritesBtn = document.getElementById("favoritesBtn");
+    const favoritesCloseBtn = document.getElementById("favoritesCloseBtn");
+
+    const themeToggle = document.getElementById("themeToggle");
+    const toggleLabel = document.querySelector(".toggle-label");
+
+    // --- Theme handling --- //
+    const THEME_KEY = "myPetCareTheme";
+    function applyStoredTheme() {
+      const stored = localStorage.getItem(THEME_KEY);
+      if (stored === "dark") {
+        document.body.classList.add("dark");
+        toggleLabel.textContent = "Light";
+      } else {
+        document.body.classList.remove("dark");
+        toggleLabel.textContent = "Dark";
+      }
+    }
+    applyStoredTheme();
+
+    themeToggle.addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+      const isDark = document.body.classList.contains("dark");
+      localStorage.setItem(THEME_KEY, isDark ? "dark" : "light");
+      toggleLabel.textContent = isDark ? "Light" : "Dark";
+    });
+
+    // --- Favorites persistence --- //
+    const FAV_KEY = "myPetCareFavorites";
+    function loadFavorites() {
+      try {
+        const stored = JSON.parse(localStorage.getItem(FAV_KEY) || "[]");
+        state.favorites = new Set(stored);
+      } catch {
+        state.favorites = new Set();
+      }
+    }
+    function saveFavorites() {
+      localStorage.setItem(FAV_KEY, JSON.stringify(Array.from(state.favorites)));
+    }
+    loadFavorites();
+
+    // --- Rendering --- //
+    function filterBreeds() {
+  const term = state.search.trim().toLowerCase();
+
+  // If there is no search term, filter only by selected category
+  if (!term) {
+    return BREEDS.filter((b) => b.category === state.category);
+  }
+
+  // If searching, ignore selected category and search globally
+  return BREEDS.filter((b) => {
+    return (
+      b.name.toLowerCase().includes(term) ||          // breed name
+      b.category.toLowerCase().includes(term)         // category (dog, cat, etc.)
+    );
+  });
+}
+
+
+    function getFeaturedBreeds() {
+      return BREEDS.filter((b) => b.featured);
+    }
+
+    function renderBreeds() {
+  const term = state.search.trim().toLowerCase();
+  const breeds = filterBreeds();
+  breedGrid.innerHTML = "";
+
+  const catLabelMap = {
+    dog: "dog",
+    cat: "cat",
+    bird: "bird",
+    fish: "fish",
+    rabbit: "rabbit",
+    hamster: "hamster",
+    lizard: "reptile",
+  };
+
+  if (!term) {
+    const label = catLabelMap[state.category] || "";
+    breedSectionTitle.textContent = `Popular ${label} breeds`;
+  } else {
+    breedSectionTitle.textContent = `Search results for “${state.search}”`;
+  }
+
+  breedCountLabel.textContent =
+    breeds.length > 0
+      ? `${breeds.length} breeds found – tap a card for care tips`
+      : "No breeds match this search. Try a different name.";
+
+  for (const breed of breeds) {
+    breedGrid.appendChild(createBreedCard(breed));
+  }
+}
+
+
+
+    function renderFeatured() {
+      const featured = getFeaturedBreeds();
+      featuredGrid.innerHTML = "";
+      for (const breed of featured) {
+        featuredGrid.appendChild(createBreedCard(breed));
+      }
+    }
+
+    function createBreedCard(breed) {
+      const card = document.createElement("article");
+      card.className = "breed-card";
+      card.dataset.id = breed.id;
+
+      const thumb = document.createElement("div");
+      thumb.className = "breed-thumb";
+      const inner = document.createElement("div");
+      inner.className = "breed-thumb-inner";
+      inner.style.backgroundImage = `url(${breed.image})`;
+      thumb.appendChild(inner);
+
+      const body = document.createElement("div");
+      body.className = "breed-body";
+
+      const textWrap = document.createElement("div");
+      const nameEl = document.createElement("div");
+      nameEl.className = "breed-name";
+      nameEl.textContent = breed.name;
+      const metaEl = document.createElement("div");
+      metaEl.className = "breed-meta";
+      metaEl.textContent = `${breed.size} · ${breed.category}`;
+
+      textWrap.appendChild(nameEl);
+      textWrap.appendChild(metaEl);
+
+      const fav = document.createElement("span");
+      fav.className = "fav-icon";
+      fav.innerHTML = "★";
+      if (state.favorites.has(breed.id)) fav.classList.add("active");
+
+      fav.addEventListener("click", (e) => {
+        e.stopPropagation();
+        toggleFavorite(breed.id);
+        fav.classList.toggle("active", state.favorites.has(breed.id));
+      });
+
+      card.appendChild(thumb);
+      body.appendChild(textWrap);
+      body.appendChild(fav);
+      card.appendChild(body);
+
+      card.addEventListener("click", () => openDetail(breed.id));
+
+      return card;
+    }
+
+    function toggleFavorite(id) {
+      if (state.favorites.has(id)) {
+        state.favorites.delete(id);
+      } else {
+        state.favorites.add(id);
+      }
+      saveFavorites();
+    }
+
+    // --- Detail view --- //
+    function openDetail(id) {
+      const breed = BREEDS.find((b) => b.id === id);
+      if (!breed) return;
+      state.detail = breed.id;
+      detailHeroImage.style.backgroundImage = `url(${breed.image})`;
+      detailBreedName.textContent = breed.name;
+      detailBreedMeta.textContent = `${breed.size} · ${breed.category.toUpperCase()} care overview`;
+
+      const cards = [
+        { key: "food", title: "Food & Diet", emoji: "🍽️" },
+        { key: "med", title: "Medication & Vaccination", emoji: "💉" },
+        { key: "groom", title: "Grooming Tips", emoji: "🧴" },
+        { key: "exercise", title: "Exercise Needs", emoji: "⚽" },
+        { key: "health", title: "Common Health Issues", emoji: "❤️" },
+        { key: "dos", title: "Do's and Don'ts", emoji: "✅" }
+      ];
+
+      detailGrid.innerHTML = "";
+      for (const cardDef of cards) {
+        const wrap = document.createElement("section");
+        wrap.className = "info-card";
+
+        const header = document.createElement("div");
+        header.className = "info-header";
+
+        const h = document.createElement("h4");
+        h.textContent = cardDef.title;
+        const icon = document.createElement("span");
+        icon.textContent = cardDef.emoji;
+        header.appendChild(h);
+        header.appendChild(icon);
+
+        const body = document.createElement("div");
+        body.className = "info-body";
+        const list = document.createElement("ul");
+
+        const itemsKey =
+          cardDef.key === "dos" ? ["dos", "donts"] : [cardDef.key];
+
+        for (const k of itemsKey) {
+          const items = breed.care[k] || [];
+          for (const item of items) {
+            const li = document.createElement("li");
+            li.textContent = item;
+            list.appendChild(li);
+          }
+        }
+        body.appendChild(list);
+
+        const tag = document.createElement("div");
+        tag.className = "info-tag";
+        tag.textContent =
+          cardDef.key === "dos"
+            ? "Quick reminders for everyday decisions."
+            : "Practical, breed-friendly guidelines.";
+
+        wrap.appendChild(header);
+        wrap.appendChild(body);
+        wrap.appendChild(tag);
+        detailGrid.appendChild(wrap);
+      }
+
+      detailPanel.classList.add("open");
+      detailPanel.setAttribute("aria-hidden", "false");
+    }
+
+    function closeDetail() {
+      detailPanel.classList.remove("open");
+      detailPanel.setAttribute("aria-hidden", "true");
+      state.detail = null;
+    }
+
+    detailCloseBtn.addEventListener("click", closeDetail);
+    detailPanel.addEventListener("click", (e) => {
+      if (e.target === detailPanel) closeDetail();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        if (detailPanel.classList.contains("open")) closeDetail();
+        if (favoritesModal.classList.contains("open")) closeFavorites();
+      }
+    });
+
+    // --- Favorites modal --- //
+    function openFavorites() {
+      favoritesList.innerHTML = "";
+      const favIds = Array.from(state.favorites);
+      if (favIds.length === 0) {
+        const empty = document.createElement("li");
+        empty.textContent =
+          "No favorites yet. Tap the star on any breed to save it. ✨";
+        empty.style.fontSize = "0.85rem";
+        empty.style.color = "var(--text-soft)";
+        favoritesList.appendChild(empty);
+      } else {
+        for (const id of favIds) {
+          const breed = BREEDS.find((b) => b.id === id);
+          if (!breed) continue;
+          const li = document.createElement("li");
+          li.className = "favorites-item";
+
+          const left = document.createElement("div");
+          left.style.display = "flex";
+          left.style.alignItems = "center";
+          left.style.gap = "0.4rem";
+          const emoji =
+            breed.category === "dog"
+              ? "🐶"
+              : breed.category === "cat"
+              ? "🐱"
+              : breed.category === "bird"
+              ? "🕊️"
+              : breed.category === "fish"
+              ? "🐟"
+              : "🐰";
+          left.innerHTML = `<span>${emoji}</span><span>${breed.name}</span>`;
+
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.innerHTML = "★";
+
+          btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            toggleFavorite(id);
+            li.remove();
+            renderBreeds();
+            if (!state.favorites.size) openFavorites();
+          });
+
+          li.addEventListener("click", () => {
+            openDetail(id);
+          });
+
+          li.appendChild(left);
+          li.appendChild(btn);
+          favoritesList.appendChild(li);
+        }
+      }
+      favoritesModal.classList.add("open");
+      favoritesModal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeFavorites() {
+      favoritesModal.classList.remove("open");
+      favoritesModal.setAttribute("aria-hidden", "true");
+    }
+
+    favoritesBtn.addEventListener("click", openFavorites);
+    favoritesCloseBtn.addEventListener("click", closeFavorites);
+    favoritesModal.addEventListener("click", (e) => {
+      if (e.target === favoritesModal) closeFavorites();
+    });
+
+    // --- Category + search events --- //
+    categoryStrip.addEventListener("click", (e) => {
+      const btn = e.target.closest(".category-pill");
+      if (!btn) return;
+      document
+        .querySelectorAll(".category-pill")
+        .forEach((el) => el.classList.remove("selected"));
+      btn.classList.add("selected");
+      state.category = btn.dataset.category;
+      state.search = "";
+      searchInput.value = "";
+      renderBreeds();
+    });
+
+    searchInput.addEventListener("input", (e) => {
+      state.search = e.target.value;
+      renderBreeds();
+    });
+
+    // Initial render
+    renderBreeds();
+  </script>
+</body>
+</html>
